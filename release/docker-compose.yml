@@ -1,0 +1,9 @@
+verdaccio:
+        build: ./
+        container_name: npmdemo-$RELEASE
+        restart: always
+        ports:
+            - "$PORT:$PORT"
+        volumes:
+            - /srv/verdaccio/$RELEASE:/verdaccio/storage:rw
+        env_file: .env
