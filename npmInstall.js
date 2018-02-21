@@ -18,7 +18,7 @@ logit('npm-populate run on ' + (new Date()).toISOString());
 const registry = process.env.NPMPOPULATE_REGISTRY;
 const skip = process.env.NPMPOPULATE_SKIP;
 if (skip) {
-  logit('skipping over ' + skip);
+  logit('skipping packages, only installing ' + skip);
 }
 
 // Operate in a build directory
@@ -50,7 +50,7 @@ moduleList.on('line', function (line, lineCount, byteCount) {
     line.length &&
     line[0] !== ' ' &&
     line[0] !== '#' && // skip comments
-    (!skip || (count++ > skip)) // allow skipping for testing 
+    (!skip || (count++ < skip)) // allow skipping for testing 
   ) {
     modules.push(line);
   }
