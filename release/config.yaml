@@ -24,15 +24,15 @@ auth:
 
 # a list of other known repositories we can talk to
 uplinks:
-  #npmjs:
-    #url: https://registry.npmjs.org/
+  npmjs:
+    url: https://registry.npmjs.org/
 
 packages:
   '@*/*':
     # scoped packages
     access: $all
     publish: $authenticated
-    proxy: npmjs
+    #proxy: npmjs
 
   '**':
     # allow all users (including non-authenticated users) to read and
@@ -47,9 +47,12 @@ packages:
     publish: $authenticated
 
     # if package is not available locally, proxy requests to 'npmjs' registry
-    proxy: npmjs
+    #proxy: npmjs
 
 # log settings
 logs:
   - {type: stdout, format: pretty, level: http}
 #- {type: file, path: verdaccio.log, level: info}
+
+web:
+  enable: false

@@ -1,5 +1,12 @@
-verdaccio:
-        build: ./
+version: '2'
+
+services:
+    verdaccio:
+        build:
+            context: ./
+            args: 
+                CONFIGFILE: $CONFIGFILE
+        image: npmdemo:$RELEASE
         container_name: npmdemo-$RELEASE
         restart: always
         ports:
