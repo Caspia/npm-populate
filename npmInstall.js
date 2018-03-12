@@ -21,6 +21,8 @@ if (skip) {
   logit('skipping packages, only installing ' + skip);
 }
 
+let modulesClone = [];
+
 // Operate in a build directory
 const buildPath = 'build';
 if (fs.existsSync(buildPath)) {
@@ -62,11 +64,12 @@ moduleList.on('close', () => {
 
   logit('Installing ' + modules.length + ' modules:');
   let printMe = '';
-  const modulesClone = modules.slice(0);
-  while (modulesClone.length) {
-    const module = modulesClone.shift();
+  modulesClone = modules.slice(0);
+  const modulesLocal = modules.slice(0);
+  while (modulesLocal.length) {
+    const module = modulesLocal.shift();
     printMe += ' ' + module;
-    if (modulesClone.length % 4 === 0) {
+    if (modulesLocal.length % 4 === 0) {
       logit(printMe);
       printMe = '';
     }
@@ -105,6 +108,24 @@ function installNextModule (command, moduleList) {
       logs += '\n' + data;
     });
     cp.on('close', (code) => {
+      try {
+        const packagePath = path.join('node_modules', nextModule, 'package.json');
+        const packageJSON = fs.readFileSync(packagePath);
+        const packageObj = JSON.parse(packageJSON);
+        for (const key in packageObj.peerDependencies) {
+          logit('Peer dependency: ' + key + ' ' + packageObj.peerDependencies[key]);
+          if (modulesClone.includes(key)) {
+            logit('Already installing ' + key);
+          } else {
+            modulesClone.push(key);
+            moduleList.push(key);
+            logit('Adding peer dependency to install list: ' + key);
+          }
+        }
+      } catch (ex) {
+        logit('Failed to get package.json for ' + nextModule);
+      }
+
       if (code !== 0) {
         finalCode = code;
       }
