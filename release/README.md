@@ -7,9 +7,13 @@
 1. Extract that file to a folder under /srv with the correct ownership. So for example, the 20180216 release is extracted as follows:
 ```
 cd /srv/verdaccio
-sudo tar --owner=100 --group=101 -xf verdaccio.tar.gz
+sudo tar --owner=100 --group=101 -xf 20180216.tar.gz
 sudo mv verdaccio 20180216
 ```
+
+(Create this using:)
+```
+sudo tar --owner=100 --group=101 --numeric-owner -czf 20180216.tar.gz 20180216
 
 1. Start the docker container (from folder npm-populate/release)
 ```
