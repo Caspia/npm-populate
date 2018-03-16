@@ -93,4 +93,3 @@ located at /srv/verdaccio/20180221 for example, run as root:
 node npmClean.js /srv/verdaccio/20180221
 
 License: Public Domain (Creative Commons CC0 https://wiki.creativecommons.org/wiki/CC0)
-
