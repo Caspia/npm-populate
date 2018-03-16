@@ -66,6 +66,10 @@ You can follow the logs for the container with the command:
 docker logs -f verdaccio
 ```
 
+To stop the verdaccio container (which will otherwise automatically restart)
+```
+docker-compose down
+```
 
 ## Post Processing
 After running npmInstall, the registry used will contain a registry package.json file for each

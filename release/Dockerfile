@@ -2,9 +2,11 @@ FROM verdaccio/verdaccio:2.7.4
 
 ARG CONFIGFILE
 ENV CONFIGFILE ${CONFIGFILE:-config.yaml}
-ENV PORT 4873
+ARG PORT
+ENV PORT ${PORT:-4873}
 ENV PROTOCOL http
 ENV APPDIR /usr/local/app
+EXPOSE ${PORT}
 
 # Adapted from ope-verdaccio from the ope project
 

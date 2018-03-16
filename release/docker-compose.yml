@@ -6,6 +6,7 @@ services:
             context: ./
             args: 
                 CONFIGFILE: $CONFIGFILE
+                PORT: $PORT
         image: verdaccio:$RELEASE
         container_name: verdaccio
         restart: always
@@ -14,3 +15,11 @@ services:
         volumes:
             - /srv/verdaccio/$RELEASE:/verdaccio/storage:rw
         env_file: .env
+        environment:
+            - VIRTUAL_HOST=verdaccio.caspia.org,npm.caspia.org,verdaccio.ed,npm.ed,verdaccio-local.caspia.org
+            - VIRTUAL_PORT=${PORT}
+
+networks:
+    default:
+        external:
+            name: nginx-proxy
