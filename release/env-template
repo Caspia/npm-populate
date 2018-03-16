@@ -1,0 +1,6 @@
+# This file contains environment variables appropriate for a particular release
+
+PORT=2301
+# CAUTION: you need to create the directory /srv/verdaccio/$RELEASE and chown 100:101 prior to running container
+RELEASE=20180315
+CONFIGFILE=configOnline.yaml

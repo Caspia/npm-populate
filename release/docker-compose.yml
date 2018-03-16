@@ -6,8 +6,8 @@ services:
             context: ./
             args: 
                 CONFIGFILE: $CONFIGFILE
-        image: npmdemo:$RELEASE
-        container_name: npmdemo-$RELEASE
+        image: verdaccio:$RELEASE
+        container_name: verdaccio
         restart: always
         ports:
             - "$PORT:$PORT"

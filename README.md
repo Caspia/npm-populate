@@ -12,7 +12,7 @@ Run this file from the command line, in the same directory as this file.
 ```
 node npmInstall.js
 ```
-Some of the modules in moduleList.txt rely on a functional git either explicitly or explicitly.
+Some of the modules in moduleList.txt rely on a functional git either implicitly or explicitly.
 Running this program in a bash command prompt installed using a standard Windows git install
 works well.
 
@@ -23,6 +23,49 @@ Two environment variables are used, both optional:
 
 NPMPOPULATE_REGISTRY: URL to use in setting the npm registry (else use the default registry)
 NPMPOPULATE_SKIP: Install only this number of modules in module list, for quick testing.
+
+## Typical setup of registry to populate
+
+First, you will need a working Docker installation (typically using a Linux server) including both docker and docker-compose. Check Docker
+for instructions on how to set that up.
+
+On the Docker host, we use volumes located at /srv/verdaccio to store the verdaccio cache that we want
+to populate.
+
+To initially populate a verdaccio cache with this program, you need to setup an empty verdaccio
+storage cache in a verdaccio container. The ```release``` directory here allows creation of an
+appropriate Docker image. Here are instructions using that to setup a blank repository.
+
+The verdaccio build in ./release uses a file ".env" containing configuration variables to store information
+about a particular populate run. A template for that file is in release/env-template. Copy that file to /release/.env
+and modify according to your run. The three variables there are:
+
+*PORT*: The numeric port that will be used on the host Docker system to serve the verdaccio instance.
+*RELEASE*: A name for this particular version of the created verdaccio cache. Typically this is just given as
+a date, like 20180315
+*CONFIGFILE*: This has one of two values. Use configOnline.yaml for runs that use the base npm registry to
+populate a cache, and config.yaml after populating to prevent further updates from the base npm registry.
+
+First, create a folder on the Docker host called /srv/verdaccio/$RELEASE (I'll assume that RELEASE is 20180315 in
+further instuctions). That folder then needs to have ownership set so that the verdaccio image can access it. Example:
+```
+mkdir -p /srv/verdaccio/20180315
+rm -rf /srv/verdaccio/20180315/*
+chown 100:101 /srv/verdaccio/20180315
+```
+(These steps can also be done by running ./release/.makeNewVolume.sh which will read variables from .env)
+
+Now build and start the verdaccio container on the Docker host. In the ./release directory, run:
+```
+docker-compose build
+docker-compose up -d
+```
+
+You can follow the logs for the container with the command:
+```
+docker logs -f verdaccio
+```
+
 
 ## Post Processing
 After running npmInstall, the registry used will contain a registry package.json file for each
