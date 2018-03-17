@@ -275,6 +275,6 @@ yeoman-generator
 zepto
 
 # These need git and will fail without it
-github:coralproject/talk
+https://github.com/coralproject/talk
 how-to-markdown
 learnyounode

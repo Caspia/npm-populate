@@ -8,43 +8,28 @@ const os = require('os');
 const path = require('path');
 const process = require('process');
 
+const modules = [];
+let modulesClone = [];
 let logs = '';
-const logit = (text) => {
-  console.log(text);
-  logs += '\n' + text;
-};
-logit('npm-populate run on ' + (new Date()).toISOString());
+let finalCode = 0;
 
 const registry = process.env.NPMPOPULATE_REGISTRY;
 const skip = process.env.NPMPOPULATE_SKIP;
+
+logit('npm-populate run on ' + (new Date()).toISOString());
 if (skip) {
   logit('skipping packages, only installing ' + skip);
 }
 
-let modulesClone = [];
-
 // Operate in a build directory
-const buildPath = 'build';
-if (fs.existsSync(buildPath)) {
-  childProcess.execSync('rmdir ' + buildPath + ' /s /q');
-}
-fs.mkdirSync(buildPath);
+const buildPath = path.join(__dirname, 'build');
 
-// We want to use a clean cache for this to make sure that all installs
-// go through the npm registry without being served from a local npm cache.
-const cachePath = './build/cache';
-fs.mkdirSync(cachePath);
-
-// use a dummy package.json in build
-fs.copyFileSync('package.json.template', './build/package.json');
-
-let commandParms = 'npm install --prefer-offline --no-save --global-style --no-package-lock --ignore-scripts --cache ./cache ';
+let commandParms = 'npm install --prefer-offline --no-save --global-style --no-package-lock --ignore-scripts --cache ../cache ';
 if (registry) {
   commandParms += ' --registry ' + registry + ' ';
 }
 
 let moduleList = readline.createInterface({input: fs.createReadStream('./moduleList.txt')});
-let modules = [];
 
 let count = 0;
 moduleList.on('line', function (line, lineCount, byteCount) {
@@ -58,10 +43,28 @@ moduleList.on('line', function (line, lineCount, byteCount) {
   }
 });
 
+moduleList.on('error', function (ex) {
+  logit('Error reading module list: ' + ex);
+});
+
 moduleList.on('close', () => {
+  installModules().then(() => {
+    // Write the logs to a file
+    const logPath = path.join(os.tmpdir(), 'npm-populate.log');
+    fs.writeFileSync(logPath, logs);
+    console.log('Wrote log file to ' + logPath);
+    logit('Final code is ' + finalCode);
+    process.exit(finalCode);
+  }).catch((ex) => {
+    console.log('Error installing modules: ' + ex);
+  });
+});
+
+async function installModules () {
   // Installs will be done in a subdirectory
   process.chdir('build');
 
+  // Print the list of modules
   logit('Installing ' + modules.length + ' modules:');
   let printMe = '';
   modulesClone = modules.slice(0);
@@ -74,72 +77,97 @@ moduleList.on('close', () => {
       printMe = '';
     }
   }
-  installNextModule(commandParms, modules);
-});
 
-moduleList.on('error', function (e) {
-  logit('Error installing modules: ' + e);
-});
+  // We want to use a clean cache for this to make sure that all installs
+  // go through the npm registry without being served from a local npm cache.
+  const cachePath = path.join(__dirname, 'cache');
+  if (fs.existsSync(cachePath)) {
+    process.chdir(__dirname);
+    childProcess.execSync('rmdir /s /q cache');
+  }
+  fs.mkdirSync(cachePath);
 
-let finalCode = 0;
+  // Install all modules
+  for (let module = modules.shift(); module; module = modules.shift()) {
+    await installNextModule(commandParms, module);
+  }
+}
 
-/**
- * Given an array of module names, runs npm install on each. Terminates
- * process when done.
- *
- * @param command String of npm command and options, missing final module name
- * @param moduleList Array of string with module names to install
- */
-function installNextModule (command, moduleList) {
-  const nextModule = moduleList.shift();
+async function installNextModule (command, nextModule) {
+  if (fs.existsSync(buildPath)) {
+    process.chdir(__dirname);
+    childProcess.execSync('rmdir /s /q build');
+  }
+  fs.mkdirSync(buildPath);
+  process.chdir(buildPath);
+
   if (nextModule) {
-    console.log('Installing ' + nextModule);
-    logs += '\nInstalling ' + nextModule;
-    const cp = childProcess.spawn(command + nextModule, [], {
+    try {
+      let resultText = '';
+      let packagePath = '';
+      if (nextModule.startsWith('https://')) {
+        // Although npm supports an install from a git repository, that does not
+        // install devDependencies which we really want. So clone the git repository
+        // locally then use a normal npm install.
+        logit('git cloning ' + nextModule);
+        resultText = await promiseCommand('git clone ' + nextModule + ' ./');
+        logit(resultText);
+        logit('Installing ' + nextModule);
+        resultText = await promiseCommand(command);
+        packagePath = 'package.json';
+      } else {
+        // use a dummy package.json in build
+        fs.copyFileSync(path.join(__dirname, 'package.json.template'), path.join(__dirname, 'build', 'package.json'));
+        logit('Installing ' + nextModule);
+        resultText = await promiseCommand(command + nextModule);
+        packagePath = path.join('node_modules', nextModule, 'package.json');
+      }
+
+      logit(resultText);
+
+      const packageJSON = fs.readFileSync(packagePath);
+      const packageObj = JSON.parse(packageJSON);
+      for (const key in packageObj.peerDependencies) {
+        logit('Peer dependency: ' + key + ' ' + packageObj.peerDependencies[key]);
+        if (modulesClone.includes(key)) {
+          logit('Already installing ' + key);
+        } else {
+          modulesClone.push(key);
+          modules.push(key);
+          logit('Adding peer dependency to install list: ' + key);
+        }
+      }
+    } catch (ex) {
+      logit('Failed to get package.json for ' + nextModule);
+    }
+  }
+}
+
+function promiseCommand (command) {
+  return new Promise((resolve, reject) => {
+    let result = '';
+    const cp = childProcess.spawn(command, [], {
       shell: true,
       windowsHide: true
     });
     cp.stdout.on('data', (data) => {
-      console.log(data.toString());
-      logs += '\n' + data;
+      result += data;
     });
     cp.stderr.on('data', (data) => {
-      console.log(data.toString());
-      logs += '\n' + data;
+      result += data;
     });
     cp.on('close', (code) => {
-      try {
-        const packagePath = path.join('node_modules', nextModule, 'package.json');
-        const packageJSON = fs.readFileSync(packagePath);
-        const packageObj = JSON.parse(packageJSON);
-        for (const key in packageObj.peerDependencies) {
-          logit('Peer dependency: ' + key + ' ' + packageObj.peerDependencies[key]);
-          if (modulesClone.includes(key)) {
-            logit('Already installing ' + key);
-          } else {
-            modulesClone.push(key);
-            moduleList.push(key);
-            logit('Adding peer dependency to install list: ' + key);
-          }
-        }
-      } catch (ex) {
-        logit('Failed to get package.json for ' + nextModule);
-      }
-
-      if (code !== 0) {
-        finalCode = code;
-      }
-      if (moduleList.length) {
-        setTimeout(() => installNextModule(command, moduleList), 0);
+      if (code === 0) {
+        resolve(result);
       } else {
-        logit('Exit code: ' + finalCode);
-
-        // Write the logs to a file
-        const logPath = path.join(os.tmpdir(), 'npm-populate.log');
-        fs.writeFileSync(logPath, logs);
-        console.log('Wrote log file to ' + logPath);
-        process.exit(finalCode);
+        finalCode = code;
+        reject(new Error(result));
       }
     });
-  }
+  });
 }
+
+function logit (text) {
+  console.log(text);
+  logs += '\n' + text;
+};
