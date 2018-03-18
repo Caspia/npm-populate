@@ -2,6 +2,12 @@ angular
 ansi-styles
 async
 axios
+
+# These need git and will fail without it. I put them here to fail early.
+https://github.com/coralproject/talk
+how-to-markdown
+learnyounode
+
 babel-cli
 babel-core
 babel-eslint
@@ -270,11 +276,7 @@ ws
 xel
 xml2js
 xtend
+yarn
 yargs
 yeoman-generator
 zepto
-
-# These need git and will fail without it
-https://github.com/coralproject/talk
-how-to-markdown
-learnyounode

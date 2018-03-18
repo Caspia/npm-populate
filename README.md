@@ -90,6 +90,6 @@ the local information prior to using the cache offline. This is the purpose of n
 a server containing an install of node as well as the verdaccio cache, run npmClean. For a verdaccio cache
 located at /srv/verdaccio/20180221 for example, run as root:
 ```
-node npmClean.js /srv/verdaccio/20180221
+sudo node npmClean.js /srv/verdaccio/20180221
 
 License: Public Domain (Creative Commons CC0 https://wiki.creativecommons.org/wiki/CC0)

@@ -24,7 +24,8 @@ if (skip) {
 // Operate in a build directory
 const buildPath = path.join(__dirname, 'build');
 
-let commandParms = 'npm install --prefer-offline --no-save --global-style --no-package-lock --ignore-scripts --cache ../cache ';
+//let commandParms = 'npm install --prefer-offline --no-save --global-style --no-package-lock --ignore-scripts --cache ../cache ';
+let commandParms = 'npm install --prefer-offline --no-save --no-package-lock --ignore-scripts --cache ../cache ';
 if (registry) {
   commandParms += ' --registry ' + registry + ' ';
 }
@@ -61,9 +62,6 @@ moduleList.on('close', () => {
 });
 
 async function installModules () {
-  // Installs will be done in a subdirectory
-  process.chdir('build');
-
   // Print the list of modules
   logit('Installing ' + modules.length + ' modules:');
   let printMe = '';
