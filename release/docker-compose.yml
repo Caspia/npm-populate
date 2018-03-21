@@ -3,7 +3,7 @@ version: '2'
 services:
     verdaccio:
         build:
-            context: ./
+            context: ../
             args: 
                 CONFIGFILE: $CONFIGFILE
                 PORT: $PORT
