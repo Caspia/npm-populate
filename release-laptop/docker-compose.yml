@@ -1,0 +1,49 @@
+version: '3'
+
+services:
+  nginx-proxy:
+    image: jwilder/nginx-proxy:alpine
+    container_name: nginx-proxy
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+
+  dnsmasq:
+    build: ./
+    image: rkent/dnsmasq:proxy
+    container_name: dnsmasq-proxy
+    restart: always
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+    env_file: .env
+    command: ["-A", "/${DOMAIN}/${IP_ADDR}"]
+    environment:
+      - IP_ADDR=$IP_ADDR
+    cap_add:
+      - NET_ADMIN
+
+  verdaccio:
+    build:
+      context: ../
+      args: 
+        CONFIGFILE: $CONFIGFILE
+        PORT: $PORT
+    image: verdaccio:$RELEASE
+    container_name: verdaccio
+    restart: always
+    ports:
+      - "$PORT:$PORT"
+    volumes:
+      - /srv/verdaccio/$RELEASE:/verdaccio/storage:rw
+    env_file: .env
+    environment:
+      - VIRTUAL_HOST=verdaccio.caspia.org,npm.caspia.org,verdaccio.ed,npm.ed,verdaccio-local.caspia.org
+      - VIRTUAL_PORT=${PORT}
+
+networks:
+  default:
+    external:
+      name: nginx-proxy

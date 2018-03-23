@@ -1,4 +1,8 @@
 build/
 node_modules/
 release/.env
+<<<<<<< HEAD
 cache
+=======
+release-laptop/.env
+>>>>>>> 4f80215fdbece61c5d158a747dcb0773d60eb4a3
