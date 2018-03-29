@@ -28,20 +28,17 @@ services:
   verdaccio:
     build:
       context: ../
-      args: 
-        CONFIGFILE: $CONFIGFILE
-        PORT: $PORT
-    image: verdaccio:$RELEASE
+    image: verdaccio:caspia
     container_name: verdaccio
     restart: always
     ports:
-      - "$PORT:$PORT"
+      - "4873:4873"
     volumes:
-      - /srv/verdaccio/$RELEASE:/verdaccio/storage:rw
+      - /srv/verdaccio:/verdaccio/storage:rw
     env_file: .env
     environment:
       - VIRTUAL_HOST=verdaccio.caspia.org,npm.caspia.org,verdaccio.ed,npm.ed,verdaccio-local.caspia.org
-      - VIRTUAL_PORT=${PORT}
+      - VIRTUAL_PORT=4873
 
 networks:
   default:
