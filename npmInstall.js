@@ -81,7 +81,7 @@ async function installModules () {
   const cachePath = path.join(__dirname, 'cache');
   if (fs.existsSync(cachePath)) {
     process.chdir(__dirname);
-    childProcess.execSync('rmdir /s /q cache');
+    childProcess.execSync('rm -rf cache');
   }
   fs.mkdirSync(cachePath);
 

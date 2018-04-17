@@ -1,3 +1,20 @@
+# official gatsby
+https://github.com/gatsbyjs/gatsby-starter-hello-world
+https://github.com/gatsbyjs/gatsby-starter-default
+https://github.com/gatsbyjs/gatsby-starter-blog
+https://github.com/gatsbyjs/gatsby-starter-kitchen-sink
+https://github.com/gatsbyjs/gatsby
+# community gatsby
+https://github.com/jaxx2104/gatsby-starter-bootstrap
+https://github.com/PrototypeInteractive/gatsby-react-boilerplate
+https://github.com/Vagr9K/gatsby-material-starter
+https://github.com/saschajullmann/gatsby-starter-gatsbythemes
+https://github.com/LeKoArts/gatsby-starter-portfolio-emma
+https://github.com/greglobinski/gatsby-starter-personal-blog
+https://github.com/ChangoMan/gatsby-starter-strata
+https://github.com/caki0915/gatsby-starter-redux
+https://github.com/codebushi/gatsby-starter-stellar
+
 angular
 ansi-styles
 async
@@ -53,6 +70,7 @@ cookie-parser
 core-js
 cors
 coveralls
+create-react-app
 css-loader
 debug
 devtron
@@ -124,6 +142,12 @@ gatsby-remark-copy-linked-files
 gatsby-plugin-lodash
 gatsby-plugin-react-css-modules
 gatsby-plugin-postcss-sass
+typography-theme-fairy-gates
+gatsby-plugin-glamor glamorous
+typography-theme-kirkham
+gatsby-source-filesystem
+gatsby-transformer-remark
+
 git-it
 glob
 graceful-fs
@@ -292,6 +316,7 @@ validator
 vue
 webpack
 webpack-dev-server
+webpack-cli
 websocket.io
 winston
 ws

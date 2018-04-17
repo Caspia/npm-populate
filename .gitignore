@@ -1,8 +1,5 @@
 build/
 node_modules/
-release/.env
-<<<<<<< HEAD
+*/.env
 cache
-=======
-release-laptop/.env
->>>>>>> 4f80215fdbece61c5d158a747dcb0773d60eb4a3
+*/*.tar
