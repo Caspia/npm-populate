@@ -8,7 +8,7 @@
 ::
 :: Usage: This batch file must be run from a DOS command prompt with administrator privileges.
 ::
-:: replaceCache VMNAME NEWFILE
+:: replaceVerdaccioCache VMNAME NEWFILE
 ::
 @echo off
 echo %~1 %~2 %~3 %~4 %~5
@@ -38,8 +38,8 @@ echo File %FILE_NAME% not found
 
 :usage
 echo Usage: (running with an administator command prompt):
-echo replaceCache VMNAME FILENAME
+echo replaceVerdaccioCache VMNAME FILENAME
 echo example:
-echo replaceCache rancheros6 c:\caspia\verdaccio_20180416.vdi
+echo replaceVerdaccioCache rancheros6 c:\caspia\verdaccio_20180416.vdi
 exit /b
 
