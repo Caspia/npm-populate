@@ -13,8 +13,15 @@ let modulesClone = [];
 let logs = '';
 let finalCode = 0;
 
-const registry = process.env.NPMPOPULATE_REGISTRY;
+const registry = process.env.NPMPOPULATE_REGISTRY || 'http://localhost:4873';
 const skip = process.env.NPMPOPULATE_SKIP;
+console.log('os is ' + os.type())
+const rmcmd = (/Linux/.test(os.type())) ? 'rm -rf ' : 'rmdir /s /q ';
+console.log('remove directory command: ' + rmcmd);
+
+function rmdir(path) {
+  childProcess.execSync(rmcmd + path);
+}
 
 logit('npm-populate run on ' + (new Date()).toISOString());
 if (skip) {
@@ -81,9 +88,11 @@ async function installModules () {
   const cachePath = path.join(__dirname, 'cache');
   if (fs.existsSync(cachePath)) {
     process.chdir(__dirname);
-    childProcess.execSync('rm -rf cache');
+    //rmdir('cache');
   }
-  fs.mkdirSync(cachePath);
+  if (!fs.existsSync(cachePath)) {
+    fs.mkdirSync(cachePath);
+  }
 
   // Install all modules
   for (let module = modules.shift(); module; module = modules.shift()) {
@@ -94,7 +103,7 @@ async function installModules () {
 async function installNextModule (command, nextModule) {
   if (fs.existsSync(buildPath)) {
     process.chdir(__dirname);
-    childProcess.execSync('rmdir /s /q build');
+    rmdir('build');
   }
   fs.mkdirSync(buildPath);
   process.chdir(buildPath);

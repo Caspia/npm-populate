@@ -34,7 +34,7 @@ services:
     ports:
       - "4873:4873"
     volumes:
-      - /srv/verdaccio:/verdaccio/storage:rw
+      - /opt/verdaccio:/verdaccio/storage:rw
     env_file: .env
     environment:
       - VIRTUAL_HOST=verdaccio.caspia.org,npm.caspia.org,verdaccio.ed,npm.ed,verdaccio-local.caspia.org

@@ -7,11 +7,11 @@ services:
             args: 
                 CONFIGFILE: $CONFIGFILE
                 PORT: $PORT
-        image: verdaccio:$RELEASE
+        image: verdaccio:caspia
         container_name: verdaccio
         restart: always
         ports:
-            - "$PORT:$PORT"
+            - "4873:4873"
         volumes:
             - /srv/verdaccio/$RELEASE:/verdaccio/storage:rw
         env_file: .env
