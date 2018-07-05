@@ -92,4 +92,13 @@ located at /srv/verdaccio/20180221 for example, run as root:
 ```
 sudo node npmClean.js /srv/verdaccio/20180221
 
+### Creating an archive
+After you run npmClean.js, in many cases you want to take the verdaccio cache, and put that in
+a single, compressed file. That file should use numeric user and groups, as it might be restored
+to a system with a different user configuration. To create an archive from a cache at /opt/volumes/verdaccio, do the following:
+```bash
+tar --numeric-owner -zcvf verdaccio.tar.gz -C /opt/volumes/verdaccio .
+```
+
+
 License: Public Domain (Creative Commons CC0 https://wiki.creativecommons.org/wiki/CC0)
