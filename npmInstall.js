@@ -8,6 +8,8 @@ const os = require('os');
 const path = require('path');
 const process = require('process');
 
+const moduleListPath = process.argv[2] || './moduleList.txt';
+
 const modules = [];
 let modulesClone = [];
 let logs = '';
@@ -37,7 +39,7 @@ if (registry) {
   commandParms += ' --registry ' + registry + ' ';
 }
 
-let moduleList = readline.createInterface({input: fs.createReadStream('./moduleList.txt')});
+let moduleList = readline.createInterface({input: fs.createReadStream(moduleListPath)});
 
 let count = 0;
 moduleList.on('line', function (line, lineCount, byteCount) {
